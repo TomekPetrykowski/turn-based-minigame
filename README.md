@@ -15,7 +15,7 @@ git clone git@github.com:TomekPetrykowski/turn-based-minigame.git
 Or you can just use HTTPS version:
 
 ```bash
-git clone git@github.com:TomekPetrykowski/turn-based-minigame.git
+git clone https://github.com/TomekPetrykowski/turn-based-minigame.git
 ```
 
 Once you clone game's repository:
