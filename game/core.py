@@ -1,4 +1,5 @@
 from game.entities import *
+from game.graphics.player_button import PlayerButton
 from .settings import *
 import pygame as pg
 
@@ -19,6 +20,10 @@ class Game:
         self.hero = Hero(name="Jerzy na Wieży", hp=100, attack_power=50)
         self.monster = Monster(name="Orek", hp=100, attack_power=25)
 
+        self.buttons = {
+            "attack": PlayerButton(200, HEIGHT - 150, "attack", self.hero_attack)
+        }
+
     # Główna pętla gry
     def run(self) -> None:
         while self.running:
@@ -28,12 +33,12 @@ class Game:
                 if event.type == pg.QUIT:
                     self.running = False
 
-                # Jeśli naciskamy spacje, to chcemy wykonać turę
-                # (w tym momencie nie jest to istotne czy to hero czy monster
-                # robimy to dla obu)
-                elif event.type == pg.KEYDOWN:
-                    if event.key == pg.K_SPACE:
-                        self.handle_turn()
+                # obsługa tur
+                if self.current_turn == "Hero":
+                    for button in self.buttons.values():
+                        button.handle_event(event)
+                else:
+                    self.handle_monster_turn()
 
             # Dalsze części pętli gry - rysowanie zaktualizowanych postaci,
             # aktualizowanie ekranu i ustawienie FPSów
@@ -60,19 +65,24 @@ class Game:
             monster_hp_text, (WIDTH - monster_hp_text.get_width() - 20, 20)
         )
 
-    # Metoda, która zajmuje się tym, kto (monster czy hero) ma teraz swoją turę
-    def handle_turn(self):
-        if self.current_turn == "Hero":
-            self.hero.attack(self.monster)
-            if not self.monster.is_alive():
-                print(f"{self.monster.name} has been defeated!")
-                self.running = False
-            else:
-                self.current_turn = "Monster"
-        elif self.current_turn == "Monster":
-            self.monster.attack(self.hero)
-            if not self.hero.is_alive():
-                print(f"{self.hero.name} has been defeated!")
-                self.running = False
-            else:
-                self.current_turn = "Hero"
+        for button in self.buttons.values():
+            button.draw(self.screen)
+
+    def handle_monster_turn(self):
+        self.monster.attack(self.hero)
+        if not self.hero.is_alive():
+            print(f"{self.hero.name} has been defeated!")
+            self.running = False
+        else:
+            self.current_turn = "Hero"
+
+    def end_hero_turn(self):
+        if not self.monster.is_alive():
+            print(f"{self.monster.name} has been defeated!")
+            self.running = False
+        else:
+            self.current_turn = "Monster"
+
+    def hero_attack(self):
+        self.hero.attack(self.monster)
+        self.end_hero_turn()

@@ -3,6 +3,7 @@
 # kolory
 BLACK = (30, 30, 30)
 WHITE = (255, 255, 255)
+ORANGE = (236, 154, 109)
 
 WIDTH = 800
 HEIGHT = 600
